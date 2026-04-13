@@ -41,7 +41,7 @@ export default async function HomePage() {
   const [works, showreel] = await Promise.all([getAllWorks(), getShowreel()]);
   const featuredWorks = works;
   // Recent 3 unique clients (works already sorted by date desc)
-  const recentClients = [...new Set(works.map((w) => w.client))].slice(0, 3);
+  const recentClients = Array.from(new Set(works.map((w) => w.client))).slice(0, 3);
 
   return (
     <>
