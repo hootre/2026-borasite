@@ -10,10 +10,10 @@ export default async function AdminPage() {
     total: works.length,
     byCategory: {
       corporate: works.filter((w) => w.category === 'corporate').length,
-      event: works.filter((w) => w.category === 'event').length,
       music: works.filter((w) => w.category === 'music').length,
-      ad: works.filter((w) => w.category === 'ad').length,
-      drama: works.filter((w) => w.category === 'drama').length,
+      filming: works.filter((w) => w.category === 'filming').length,
+      sketch: works.filter((w) => w.category === 'sketch').length,
+      youtube: works.filter((w) => w.category === 'youtube').length,
     },
     vimeoConnected: works.some((w) => w.vimeoId && w.vimeoId.length > 5),
   };
