@@ -17,14 +17,22 @@ export default function EditModal({ work, onClose, onSave }: Props) {
   const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [uploadingThumb, setUploadingThumb] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const mouseDownTarget = useRef<EventTarget | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ESC 닫기
+  // ESC 닫기 + 모달 열릴 때 배경 스크롤 방지
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handler);
+      document.body.style.overflow = '';
+    };
   }, [onClose]);
 
   const handleSave = async () => {
@@ -52,18 +60,53 @@ export default function EditModal({ work, onClose, onSave }: Props) {
         return;
       }
 
+      // 썸네일 파일 있으면 업로드
+      let thumbWarning = '';
+      if (thumbnailFile) {
+        setUploadingThumb(true);
+        const formData = new FormData();
+        formData.append('thumbnail', thumbnailFile);
+
+        const thumbRes = await fetch(`/api/vimeo-thumbnail/${work.vimeoId}`, {
+          method: 'POST',
+          body: formData,
+        });
+        const thumbData = await thumbRes.json();
+        setUploadingThumb(false);
+
+        if (!thumbRes.ok) {
+          thumbWarning = `썸네일 업로드 실패: ${thumbData.message || thumbData.error || thumbRes.status}`;
+        }
+      }
+
       onSave({ title: name, description, tags: tagArray });
 
-      if (data.tagWarning) {
-        alert(data.tagWarning);
-      }
+      const warnings = [data.tagWarning, thumbWarning].filter(Boolean).join('\n');
+      if (warnings) alert(warnings);
 
       onClose();
     } catch (e: any) {
       setError('네트워크 오류: ' + e.message);
     } finally {
       setSaving(false);
+      setUploadingThumb(false);
     }
+  };
+
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('이미지 파일만 업로드 가능합니다.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('이미지는 10MB 이하만 업로드 가능합니다.');
+      return;
+    }
+    setThumbnailFile(file);
+    setThumbnailPreview(URL.createObjectURL(file));
+    setError('');
   };
 
   return (
@@ -97,7 +140,60 @@ export default function EditModal({ work, onClose, onSave }: Props) {
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 space-y-4">
+        <div className="px-6 py-5 space-y-4 max-h-[75vh] overflow-y-auto">
+          {/* 썸네일 */}
+          <div>
+            <label className="block text-xs text-[#888899] mb-1.5">
+              썸네일 <span className="text-[#444455]">(JPG · PNG · 최대 10MB)</span>
+            </label>
+            <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-white/3 group">
+              {/* 미리보기 */}
+              <img
+                src={thumbnailPreview || work.thumbnail}
+                alt="썸네일"
+                className="w-full h-full object-cover"
+              />
+              {/* 변경 버튼 오버레이 */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 text-white text-sm"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                <span>{thumbnailFile ? '다른 이미지 선택' : '썸네일 교체'}</span>
+              </button>
+              {thumbnailFile && (
+                <div className="absolute top-2 right-2 bg-[#7B5EA7] text-white text-[10px] font-bold px-2 py-1 rounded-lg">
+                  변경됨
+                </div>
+              )}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleThumbnailSelect}
+              className="hidden"
+            />
+            {thumbnailFile && (
+              <button
+                type="button"
+                onClick={() => {
+                  setThumbnailFile(null);
+                  setThumbnailPreview(null);
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                }}
+                className="text-[10px] text-[#888899] hover:text-red-400 mt-1.5 transition-colors"
+              >
+                ↺ 변경 취소
+              </button>
+            )}
+          </div>
+
           {/* 제목 */}
           <div>
             <label className="block text-xs text-[#888899] mb-1.5">영상 제목 *</label>
@@ -169,7 +265,7 @@ export default function EditModal({ work, onClose, onSave }: Props) {
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-[#7B5EA7]/60 transition-all placeholder-[#444455]"
             />
             <p className="text-[10px] text-[#444455] mt-1">
-              카테고리: 기업홍보·뮤직비디오·광고·촬영·현장스케치·유튜브 | 날짜: YYMMDD (예: 260413) | Backspace로 마지막 태그 삭제
+              카테고리: 기업홍보·광고·광고/홍보·뮤직비디오·촬영·현장스케치·유튜브 | 날짜: YYMMDD (예: 260413) | Backspace로 마지막 태그 삭제
             </p>
           </div>
 
@@ -222,7 +318,7 @@ export default function EditModal({ work, onClose, onSave }: Props) {
                 <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 12a9 9 0 11-6.219-8.56" />
                 </svg>
-                저장 중...
+                {uploadingThumb ? '썸네일 업로드 중...' : '저장 중...'}
               </>
             ) : '저장'}
           </button>

@@ -56,7 +56,7 @@ export default function Services() {
   }, []);
 
   return (
-    <section ref={ref} className="py-24 bg-[#10101A]">
+    <section ref={ref} className="hidden sm:block py-24 bg-[#10101A]">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16 reveal">
           <p className="text-[#7B5EA7] text-sm font-semibold tracking-widest uppercase mb-3">Why BORAMEDIA</p>

@@ -23,7 +23,6 @@ type Tab = 'works' | 'upload' | 'settings';
 const CAT_COLORS: Record<string, string> = {
   corporate: 'text-blue-400 bg-blue-400/10',
   music: 'text-pink-400 bg-pink-400/10',
-  ad: 'text-orange-400 bg-orange-400/10',
   filming: 'text-cyan-400 bg-cyan-400/10',
   sketch: 'text-green-400 bg-green-400/10',
   youtube: 'text-red-400 bg-red-400/10',
@@ -394,7 +393,6 @@ export default function AdminDashboard({
     byCategory: {
       corporate: works.filter((w) => w.category === 'corporate').length,
       music: works.filter((w) => w.category === 'music').length,
-      ad: works.filter((w) => w.category === 'ad').length,
       filming: works.filter((w) => w.category === 'filming').length,
       sketch: works.filter((w) => w.category === 'sketch').length,
       youtube: works.filter((w) => w.category === 'youtube').length,
@@ -433,7 +431,7 @@ export default function AdminDashboard({
         {/* Top nav */}
         <header className="border-b border-white/8 px-6 py-4 flex items-center justify-between sticky top-0 z-40 backdrop-blur-md"
           style={{ background: 'rgba(10,10,20,0.9)' }}>
-          <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{ background: 'linear-gradient(135deg, #7B5EA7, #9B6EC7)' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
@@ -442,7 +440,7 @@ export default function AdminDashboard({
             </div>
             <span className="font-black text-white text-lg">BORAMEDIA</span>
             <span className="text-[#555566] text-sm hidden sm:block">/ Admin</span>
-          </div>
+          </Link>
           <div className="flex items-center gap-2">
             <Link href="/" target="_blank"
               className="hidden sm:flex items-center gap-1 text-xs text-[#888899] hover:text-white transition-colors px-3 py-1.5 rounded-lg border border-white/8 hover:border-white/15">
@@ -478,8 +476,8 @@ export default function AdminDashboard({
               color={currentStats.vimeoConnected ? 'text-green-400' : 'text-yellow-400'}
             />
             <StatCard
-              label="기업홍보 / 광고"
-              value={`${currentStats.byCategory.corporate} / ${currentStats.byCategory.ad}`}
+              label="광고/홍보"
+              value={`${currentStats.byCategory.corporate}`}
               color="text-blue-400"
             />
             <StatCard

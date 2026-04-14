@@ -200,6 +200,7 @@ body {
 .btn-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 14px 32px;
   background: linear-gradient(135deg, var(--accent), var(--purple));
@@ -219,6 +220,7 @@ body {
 .btn-secondary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 13px 32px;
   background: transparent;

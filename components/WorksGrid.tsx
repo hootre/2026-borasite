@@ -12,7 +12,21 @@ interface Props {
 
 export default function WorksGrid({ works }: Props) {
   const [active, setActive] = useState<WorkCategory>("all");
+  const [isMobile, setIsMobile] = useState(false);
   const [visible, setVisible] = useState(8);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  const initialVisible = isMobile ? 4 : 8;
+
+  useEffect(() => {
+    setVisible(initialVisible);
+  }, [initialVisible]);
   const sectionRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
   const isWorksPage = pathname === "/works";
@@ -21,7 +35,6 @@ export default function WorksGrid({ works }: Props) {
     "all",
     "corporate",
     "music",
-    "ad",
     "filming",
     "sketch",
     "youtube",
@@ -54,7 +67,7 @@ export default function WorksGrid({ works }: Props) {
       className="py-24 max-w-7xl mx-auto px-6 min-h-[900px]"
     >
       {/* Header */}
-      <div className="reveal flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+      <div className="reveal flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 text-center md:text-left">
         <div>
           <p className="text-[#7B5EA7] text-sm font-semibold tracking-widest uppercase mb-3">
             Our Works
@@ -81,13 +94,13 @@ export default function WorksGrid({ works }: Props) {
       </div>
 
       {/* Category filter */}
-      <div className="reveal flex gap-2 overflow-x-auto pb-2 mb-10 scrollbar-hide">
+      <div className="reveal flex flex-wrap justify-center md:justify-start gap-2 mb-10">
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => {
               setActive(cat);
-              setVisible(8);
+              setVisible(initialVisible);
             }}
             className={`cat-btn ${active === cat ? "active" : ""}`}
           >

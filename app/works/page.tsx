@@ -16,12 +16,12 @@ export default async function WorksPage() {
   return (
     <div className="min-h-screen pt-20">
       {/* Page header */}
-      <div className="py-16 px-6 max-w-7xl mx-auto hero-gradient">
+      <div className="py-16 px-6 max-w-7xl mx-auto hero-gradient text-center md:text-left">
         <p className="text-[#7B5EA7] text-sm font-semibold tracking-widest uppercase mb-3">Portfolio</p>
         <h1 className="text-5xl lg:text-7xl font-black tracking-tight">
           <span className="gradient-text">All Works</span>
         </h1>
-        <p className="text-[#888899] mt-4 text-lg max-w-md">
+        <p className="text-[#888899] mt-4 text-lg max-w-md mx-auto md:mx-0">
           보라미디어가 만든 {works.length}편의 영상 작품을 확인하세요.
         </p>
       </div>

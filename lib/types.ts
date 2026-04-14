@@ -30,7 +30,6 @@ export type WorkCategory =
   | 'corporate'
   | 'event'
   | 'music'
-  | 'ad'
   | 'drama'
   | 'filming'
   | 'sketch'
@@ -38,10 +37,9 @@ export type WorkCategory =
 
 export const CATEGORY_LABELS: Record<WorkCategory, string> = {
   all:       '전체',
-  corporate: '기업홍보',
+  corporate: '광고/홍보',
   event:     '이벤트',
   music:     '뮤직비디오',
-  ad:        '광고',
   drama:     '드라마·숏폼',
   filming:   '촬영',
   sketch:    '현장스케치',

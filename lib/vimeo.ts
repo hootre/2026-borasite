@@ -42,13 +42,15 @@ async function vimeoFetch(path: string, params?: Record<string, string>) {
 const TAG_TO_CATEGORY: Record<string, WorkCategory> = {
   '기업홍보': 'corporate',
   'corporate': 'corporate',
+  '광고홍보': 'corporate',
+  '광고/홍보': 'corporate',
+  '광고': 'corporate',
+  'ad': 'corporate',
   '이벤트': 'event',
   'event': 'event',
   '뮤직비디오': 'music',
   'music': 'music',
   'mv': 'music',
-  '광고': 'ad',
-  'ad': 'ad',
   '드라마': 'drama',
   'drama': 'drama',
   '숏폼': 'drama',
@@ -69,7 +71,7 @@ function detectCategory(title: string, tags: string[]): WorkCategory {
   const t = (title + ' ' + tags.join(' ')).toLowerCase();
   if (/뮤직|music|mv|music.video/.test(t)) return 'music';
   if (/드라마|drama|숏폼|shortform|short.form/.test(t)) return 'drama';
-  if (/광고|ad|commercial|tvc/.test(t)) return 'ad';
+  if (/광고|홍보|ad|commercial|tvc/.test(t)) return 'corporate';
   if (/현장스케치|현장.스케치|sketch/.test(t)) return 'sketch';
   if (/행사|박람회|페스티벌|이벤트|event|festival/.test(t)) return 'event';
   return 'corporate';
