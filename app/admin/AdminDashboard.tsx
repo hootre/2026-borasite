@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { WorkMeta, CATEGORY_LABELS } from '@/lib/types';
 import { logoutAction } from './actions';
 import EditModal from './EditModal';
@@ -349,6 +350,29 @@ export default function AdminDashboard({
   const [deletingWork, setDeletingWork] = useState<WorkMeta | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshMsg, setRefreshMsg] = useState('');
+  const router = useRouter();
+
+  // ── 캐시 새로고침
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    setRefreshMsg('');
+    try {
+      const res = await fetch('/api/admin/refresh', { method: 'POST' });
+      if (res.ok) {
+        setRefreshMsg('✓ 새로고침 완료');
+        router.refresh(); // 서버 컴포넌트 재실행 → 최신 Vimeo 데이터 반영
+      } else {
+        setRefreshMsg('오류가 발생했습니다.');
+      }
+    } catch {
+      setRefreshMsg('네트워크 오류');
+    } finally {
+      setRefreshing(false);
+      setTimeout(() => setRefreshMsg(''), 3000);
+    }
+  };
 
   // ── 수정 저장
   const handleSave = (updated: Partial<WorkMeta>) => {
@@ -442,6 +466,26 @@ export default function AdminDashboard({
             <span className="text-[#555566] text-sm hidden sm:block">/ Admin</span>
           </Link>
           <div className="flex items-center gap-2">
+            {/* 캐시 새로고침 버튼 */}
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              title="Vimeo 데이터 즉시 새로고침"
+              className="flex items-center gap-1.5 text-xs text-[#888899] hover:text-green-400 transition-colors px-3 py-1.5 rounded-lg border border-white/8 hover:border-green-400/30 disabled:opacity-50"
+            >
+              <svg
+                width="12" height="12" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2.5"
+                className={refreshing ? 'animate-spin' : ''}
+              >
+                <path d="M23 4v6h-6" />
+                <path d="M1 20v-6h6" />
+                <path d="M3.51 9a9 9 0 0114.36-3.36L23 10M1 14l5.13 4.36A9 9 0 0020.49 15" />
+              </svg>
+              <span className="hidden sm:inline">
+                {refreshMsg || (refreshing ? '새로고침 중...' : '새로고침')}
+              </span>
+            </button>
             <Link href="/" target="_blank"
               className="hidden sm:flex items-center gap-1 text-xs text-[#888899] hover:text-white transition-colors px-3 py-1.5 rounded-lg border border-white/8 hover:border-white/15">
               사이트 보기

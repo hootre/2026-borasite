@@ -8,7 +8,7 @@ const USER_ID = process.env.VIMEO_USER_ID ?? 'me';
 
 let cachedWorks: WorkMeta[] | null = null;
 let cacheTimestamp = 0;
-const CACHE_TTL = 60 * 1000; // 60초 인메모리 캐시
+const CACHE_TTL = 10 * 1000; // 10초 인메모리 캐시
 
 function invalidateCache() {
   cachedWorks = null;

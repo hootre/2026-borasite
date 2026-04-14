@@ -85,11 +85,11 @@ export default function ContactPage() {
                   className="w-full bg-[#10101A] border border-[#22223A] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#7B5EA7] transition-colors appearance-none cursor-pointer"
                 >
                   <option value="">선택하세요</option>
-                  <option value="corporate">기업홍보 영상</option>
-                  <option value="event">이벤트 스케치</option>
+                  <option value="corporate">광고/홍보 영상</option>
                   <option value="music">뮤직비디오</option>
-                  <option value="ad">광고 영상</option>
-                  <option value="drama">드라마 · 숏폼</option>
+                  <option value="filming">촬영</option>
+                  <option value="sketch">현장스케치</option>
+                  <option value="youtube">유튜브 콘텐츠</option>
                   <option value="other">기타</option>
                 </select>
               </div>
