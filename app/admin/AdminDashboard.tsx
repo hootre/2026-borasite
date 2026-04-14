@@ -8,6 +8,7 @@ import { WorkMeta, CATEGORY_LABELS } from '@/lib/types';
 import { logoutAction } from './actions';
 import EditModal from './EditModal';
 import UploadSection from './UploadSection';
+import SiteConfigEditor from './SiteConfigEditor';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -17,7 +18,7 @@ interface Stats {
   vimeoConnected: boolean;
 }
 
-type Tab = 'works' | 'upload' | 'settings';
+type Tab = 'works' | 'upload' | 'homepage' | 'settings';
 
 // ─── Category color map ──────────────────────────────────────────────────────
 
@@ -424,8 +425,9 @@ export default function AdminDashboard({
   };
 
   const TABS: { key: Tab; label: string }[] = [
-    { key: 'works', label: `작품 관리 (${works.length})` },
-    { key: 'upload', label: '영상 업로드' },
+    { key: 'works',    label: `작품 관리 (${works.length})` },
+    { key: 'upload',   label: '영상 업로드' },
+    { key: 'homepage', label: '홈페이지 수정' },
     { key: 'settings', label: '설정' },
   ];
 
@@ -579,6 +581,17 @@ export default function AdminDashboard({
                 <p className="text-[#888899] text-sm mt-1">Vimeo 계정에 영상을 업로드합니다.</p>
               </div>
               <UploadSection hasToken={hasToken} />
+            </div>
+          )}
+
+          {/* ── Homepage Tab ── */}
+          {tab === 'homepage' && (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-lg font-bold text-white">홈페이지 수정</h2>
+                <p className="text-[#888899] text-sm mt-1">메인 페이지의 타이틀, 통계, 카테고리 이름을 수정합니다.</p>
+              </div>
+              <SiteConfigEditor />
             </div>
           )}
 

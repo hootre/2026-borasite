@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import ContactForm from './ContactForm';
 
 export const metadata: Metadata = {
   title: 'Contact | 프로젝트 문의',
@@ -41,95 +42,7 @@ export default function ContactPage() {
           {/* Contact form */}
           <div className="glass rounded-2xl p-8 border border-white/5">
             <h2 className="text-lg font-bold text-white mb-6">문의 양식</h2>
-            <form
-              action="https://formsubmit.co/artinsky@boramedia.co.kr"
-              method="POST"
-              className="space-y-5"
-            >
-              <input type="hidden" name="_subject" value="[BORAMEDIA] 새 프로젝트 문의" />
-              <input type="hidden" name="_captcha" value="false" />
-              <input type="hidden" name="_next" value="https://boramedia.co.kr/contact?sent=1" />
-
-              <div>
-                <label className="block text-xs font-semibold text-[#888899] mb-1.5 uppercase tracking-wider">
-                  이름 / 회사명 *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  placeholder="홍길동 / (주)보라미디어"
-                  className="w-full bg-[#10101A] border border-[#22223A] rounded-xl px-4 py-3 text-white text-sm placeholder:text-[#444455] focus:outline-none focus:border-[#7B5EA7] transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#888899] mb-1.5 uppercase tracking-wider">
-                  이메일 *
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="contact@company.com"
-                  className="w-full bg-[#10101A] border border-[#22223A] rounded-xl px-4 py-3 text-white text-sm placeholder:text-[#444455] focus:outline-none focus:border-[#7B5EA7] transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#888899] mb-1.5 uppercase tracking-wider">
-                  프로젝트 유형
-                </label>
-                <select
-                  name="type"
-                  className="w-full bg-[#10101A] border border-[#22223A] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#7B5EA7] transition-colors appearance-none cursor-pointer"
-                >
-                  <option value="">선택하세요</option>
-                  <option value="corporate">광고/홍보 영상</option>
-                  <option value="music">뮤직비디오</option>
-                  <option value="filming">촬영</option>
-                  <option value="sketch">현장스케치</option>
-                  <option value="youtube">유튜브 콘텐츠</option>
-                  <option value="other">기타</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#888899] mb-1.5 uppercase tracking-wider">
-                  예산 규모 (선택)
-                </label>
-                <select
-                  name="budget"
-                  className="w-full bg-[#10101A] border border-[#22223A] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#7B5EA7] transition-colors appearance-none cursor-pointer"
-                >
-                  <option value="">선택하세요</option>
-                  <option value="under_10m">1,000만원 미만</option>
-                  <option value="10m_30m">1,000 ~ 3,000만원</option>
-                  <option value="30m_50m">3,000 ~ 5,000만원</option>
-                  <option value="over_50m">5,000만원 이상</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#888899] mb-1.5 uppercase tracking-wider">
-                  프로젝트 내용 *
-                </label>
-                <textarea
-                  name="message"
-                  required
-                  rows={5}
-                  placeholder="어떤 영상을 제작하고 싶으신지, 일정, 참고사항 등을 자유롭게 작성해주세요."
-                  className="w-full bg-[#10101A] border border-[#22223A] rounded-xl px-4 py-3 text-white text-sm placeholder:text-[#444455] focus:outline-none focus:border-[#7B5EA7] transition-colors resize-none"
-                />
-              </div>
-
-              <button type="submit" className="btn-primary w-full justify-center py-4 text-base">
-                문의 보내기
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-                </svg>
-              </button>
-            </form>
+            <ContactForm />
           </div>
 
           {/* Direct contact */}

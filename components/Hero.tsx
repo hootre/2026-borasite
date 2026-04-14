@@ -2,13 +2,16 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { SiteConfig, DEFAULT_CONFIG } from "@/lib/siteConfigTypes";
 
 interface HeroProps {
   showreelEmbedUrl?: string | null;
   recentClients?: string[];
+  siteConfig?: SiteConfig;
 }
 
-export default function Hero({ showreelEmbedUrl, recentClients }: HeroProps) {
+export default function Hero({ showreelEmbedUrl, siteConfig }: HeroProps) {
+  const cfg = siteConfig ?? DEFAULT_CONFIG;
   const textRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -63,21 +66,21 @@ export default function Hero({ showreelEmbedUrl, recentClients }: HeroProps) {
           <div ref={textRef} className="reveal lg:col-span-2 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-semibold text-purple-300 mb-6 sm:mb-8 border border-purple-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-              영상 프로덕션 전문 기업
+              {cfg.heroBadge}
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-7xl font-black leading-[1.05] tracking-tight mb-5 sm:mb-6">
-              <span className="gradient-text">생동감 넘치게</span>
+              <span className="gradient-text">{cfg.heroLine1}</span>
               <br />
-              <span className="text-white">당신의 이야기를</span>
+              <span className="text-white">{cfg.heroLine2}</span>
               <br />
-              <span className="gradient-text-gold">기록해드립니다.</span>
+              <span className="gradient-text-gold">{cfg.heroLine3}</span>
             </h1>
 
             <p className="text-[#888899] text-base sm:text-lg leading-relaxed mb-8 sm:mb-10 max-w-lg mx-auto lg:mx-0">
-              영상이라는 매체로 당신의 순간을 생생하게 기록합니다.
-              <br />
-              기업홍보 · 공연 · 뮤직비디오 · 이벤트 · 광고 영상 전문 제작.
+              {cfg.heroSubtitle.split('\n').map((line, i) => (
+                <span key={i}>{line}{i < cfg.heroSubtitle.split('\n').length - 1 && <br />}</span>
+              ))}
             </p>
 
             <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4">
@@ -98,9 +101,9 @@ export default function Hero({ showreelEmbedUrl, recentClients }: HeroProps) {
             {/* Mini stats */}
             <div className="grid grid-cols-3 mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-[#22223A] w-full">
               {[
-                { num: "137+", label: "고객사" },
-                { num: "385+", label: "제작 영상" },
-                { num: "5+", label: "전문 팀원" },
+                { num: cfg.statClients, label: "고객사" },
+                { num: cfg.statVideos,  label: "제작 영상" },
+                { num: cfg.statTeam,    label: "전문 팀원" },
               ].map(({ num, label }) => (
                 <div key={label}>
                   <div className="text-3xl sm:text-4xl lg:text-5xl font-black gradient-text">{num}</div>

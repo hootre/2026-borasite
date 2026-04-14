@@ -7,6 +7,7 @@ import Stats from '@/components/Stats';
 import Services from '@/components/Services';
 import ContactSection from '@/components/ContactSection';
 import { getAllWorks, getShowreel } from '@/lib/vimeo';
+import { getSiteConfig } from '@/lib/siteConfig';
 
 export const metadata: Metadata = {
   title: 'BORAMEDIA | 영상 프로덕션 전문 기업',
@@ -40,14 +41,22 @@ function HomeSchema({ worksCount }: { worksCount: number }) {
 export default async function HomePage() {
   const [works, showreel] = await Promise.all([getAllWorks(), getShowreel()]);
   const featuredWorks = works;
-  // Recent 3 unique clients (works already sorted by date desc)
   const recentClients = Array.from(new Set(works.map((w) => w.client))).slice(0, 3);
+  const siteConfig = getSiteConfig();
+  const customCategoryLabels = {
+    all:       siteConfig.catAll,
+    corporate: siteConfig.catCorporate,
+    music:     siteConfig.catMusic,
+    filming:   siteConfig.catFilming,
+    sketch:    siteConfig.catSketch,
+    youtube:   siteConfig.catYoutube,
+  };
 
   return (
     <>
       <HomeSchema worksCount={works.length} />
-      <Hero showreelEmbedUrl={showreel?.embedUrl} recentClients={recentClients} />
-      <WorksGrid works={featuredWorks} />
+      <Hero showreelEmbedUrl={showreel?.embedUrl} recentClients={recentClients} siteConfig={siteConfig} />
+      <WorksGrid works={featuredWorks} customCategoryLabels={customCategoryLabels} />
       <Stats />
       <Services />
       <ContactSection />

@@ -8,12 +8,16 @@ import { WorkMeta, WorkCategory, CATEGORY_LABELS } from "@/lib/types";
 
 interface Props {
   works: WorkMeta[];
+  customCategoryLabels?: Partial<Record<string, string>>;
 }
 
-export default function WorksGrid({ works }: Props) {
+export default function WorksGrid({ works, customCategoryLabels }: Props) {
   const [active, setActive] = useState<WorkCategory>("all");
   const [isMobile, setIsMobile] = useState(false);
   const [visible, setVisible] = useState(8);
+
+  // 기본 라벨과 커스텀 라벨 병합
+  const labels: Record<string, string> = { ...CATEGORY_LABELS, ...customCategoryLabels };
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640);
@@ -27,6 +31,7 @@ export default function WorksGrid({ works }: Props) {
   useEffect(() => {
     setVisible(initialVisible);
   }, [initialVisible]);
+
   const sectionRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
   const isWorksPage = pathname === "/works";
@@ -79,14 +84,7 @@ export default function WorksGrid({ works }: Props) {
         {!isWorksPage && (
           <Link href="/works" className="btn-secondary text-sm shrink-0">
             전체 보기
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </Link>
@@ -104,7 +102,7 @@ export default function WorksGrid({ works }: Props) {
             }}
             className={`cat-btn ${active === cat ? "active" : ""}`}
           >
-            {CATEGORY_LABELS[cat]}
+            {labels[cat] ?? cat}
           </button>
         ))}
       </div>
@@ -112,7 +110,7 @@ export default function WorksGrid({ works }: Props) {
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {displayed.map((work, i) => (
-          <WorkCard key={work.id} work={work} index={i} />
+          <WorkCard key={work.id} work={work} index={i} labels={labels} />
         ))}
       </div>
 
@@ -142,7 +140,6 @@ function getTagYear(tags: string[]): number | null {
 }
 
 function isNew(tags: string[]): boolean {
-  // 태그에서 6자리 날짜(YYMMDD) 찾기
   for (const tag of tags) {
     const match = tag.match(/^(\d{6})$/);
     if (match) {
@@ -158,7 +155,7 @@ function isNew(tags: string[]): boolean {
   return false;
 }
 
-function WorkCard({ work, index }: { work: WorkMeta; index: number }) {
+function WorkCard({ work, index, labels }: { work: WorkMeta; index: number; labels: Record<string, string> }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -201,7 +198,6 @@ function WorkCard({ work, index }: { work: WorkMeta; index: number }) {
               </svg>
             </div>
           </div>
-          {/* NEW badge */}
           {isNew(work.tags) && (
             <div className="absolute top-3 left-3 bg-white text-[#1A1A2E] text-[10px] font-black tracking-wider px-2 py-0.5 rounded-full shadow-lg">
               NEW
@@ -222,7 +218,7 @@ function WorkCard({ work, index }: { work: WorkMeta; index: number }) {
               {getTagYear(work.tags) ?? work.year}
             </span>
             <span className="text-[10px] text-[#888899] bg-white/5 px-2 py-0.5 rounded-full">
-              {CATEGORY_LABELS[work.category]}
+              {labels[work.category] ?? work.category}
             </span>
           </div>
         </div>

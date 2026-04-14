@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import WorksGrid from '@/components/WorksGrid';
 import { getAllWorks } from '@/lib/vimeo';
+import { getSiteConfig } from '@/lib/siteConfig';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,15 @@ export const metadata: Metadata = {
 };
 
 export default async function WorksPage() {
-  const works = await getAllWorks();
+  const [works, siteConfig] = await Promise.all([getAllWorks(), Promise.resolve(getSiteConfig())]);
+  const customCategoryLabels = {
+    all:       siteConfig.catAll,
+    corporate: siteConfig.catCorporate,
+    music:     siteConfig.catMusic,
+    filming:   siteConfig.catFilming,
+    sketch:    siteConfig.catSketch,
+    youtube:   siteConfig.catYoutube,
+  };
 
   return (
     <div className="min-h-screen pt-20">
@@ -25,7 +34,7 @@ export default async function WorksPage() {
           보라미디어가 만든 {works.length}편의 영상 작품을 확인하세요.
         </p>
       </div>
-      <WorksGrid works={works} />
+      <WorksGrid works={works} customCategoryLabels={customCategoryLabels} />
     </div>
   );
 }
