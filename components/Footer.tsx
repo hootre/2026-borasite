@@ -38,8 +38,9 @@ export default function Footer() {
               Contact
             </h4>
             <div className="flex flex-col gap-2 text-sm text-[#888899]">
+              <p>대표자 : 전동찬</p>
               <p className="hover:text-white transition-colors">
-                PHONE : 01080071895
+                PHONE : 01021661895
               </p>
               <a
                 href="mailto:artinsky@boramedia.co.kr"
