@@ -1,24 +1,97 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { SiteConfig, DEFAULT_CONFIG } from "@/lib/siteConfigTypes";
 
 interface HeroProps {
   showreelEmbedUrl?: string | null;
+  showreelThumbnail?: string | null;
   recentClients?: string[];
   siteConfig?: SiteConfig;
 }
 
-export default function Hero({ showreelEmbedUrl, siteConfig }: HeroProps) {
+export default function Hero({ showreelEmbedUrl, showreelThumbnail, siteConfig }: HeroProps) {
   const cfg = siteConfig ?? DEFAULT_CONFIG;
   const textRef = useRef<HTMLDivElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   useEffect(() => {
     const el = textRef.current;
     if (!el) return;
     setTimeout(() => el.classList.add("visible"), 100);
   }, []);
+
+  // 썸네일 fallback: Vimeo CDN 또는 그라디언트 플레이스홀더
+  const posterUrl = showreelThumbnail || null;
+
+  const VideoWrapper = ({ className }: { className?: string }) => (
+    <div className={`glass rounded-2xl overflow-hidden border border-white/5 shadow-2xl ${className ?? ''}`}>
+      <div className="video-wrapper relative">
+        {/* 로딩 오버레이 - 영상 로드 전까지 표시 */}
+        <div
+          className="absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-700"
+          style={{ opacity: videoLoaded ? 0 : 1, pointerEvents: videoLoaded ? 'none' : 'auto' }}
+        >
+          {/* 썸네일 배경 */}
+          {posterUrl ? (
+            <Image
+              src={posterUrl}
+              alt="Showreel thumbnail"
+              fill
+              className="object-cover"
+              priority
+            />
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(135deg, #1A1A2E 0%, #2D2B55 50%, #1A1A2E 100%)' }}
+            />
+          )}
+          {/* 어두운 오버레이 */}
+          <div className="absolute inset-0 bg-black/40" />
+          {/* 스피너 + 텍스트 */}
+          <div className="relative z-10 flex flex-col items-center gap-3">
+            <div className="relative w-14 h-14">
+              {/* 바깥 원 */}
+              <svg className="absolute inset-0 animate-spin" viewBox="0 0 56 56" fill="none">
+                <circle cx="28" cy="28" r="24" stroke="rgba(123,94,167,0.25)" strokeWidth="3" />
+                <path
+                  d="M28 4 A24 24 0 0 1 52 28"
+                  stroke="#9B72CF"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              </svg>
+              {/* 재생 아이콘 */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
+            <span className="text-white/60 text-xs tracking-widest uppercase">Loading Showreel</span>
+          </div>
+        </div>
+
+        {/* 실제 Vimeo iframe */}
+        <iframe
+          src={showreelEmbedUrl ? `${showreelEmbedUrl}&background=1&autoplay=1&loop=1&muted=1` : 'about:blank'}
+          allow="autoplay; fullscreen; picture-in-picture"
+          style={{ border: 0, opacity: videoLoaded ? 1 : 0, transition: 'opacity 0.7s ease' }}
+          title="BORAMEDIA Showreel"
+          onLoad={() => setVideoLoaded(true)}
+        />
+      </div>
+
+      {/* SHOWREEL 뱃지 */}
+      <div className="absolute top-4 left-4 inline-flex items-center gap-2 glass px-3 py-1.5 rounded-full text-xs font-semibold text-white z-20">
+        <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+        SHOWREEL 2026
+      </div>
+    </div>
+  );
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden hero-gradient">
@@ -44,20 +117,7 @@ export default function Hero({ showreelEmbedUrl, siteConfig }: HeroProps) {
 
         {/* 모바일: showreel 상단 배치 */}
         <div className="block lg:hidden mb-6 relative">
-          <div className="glass rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
-            <div className="video-wrapper">
-              <iframe
-                src={showreelEmbedUrl ? `${showreelEmbedUrl}&background=1&autoplay=1&loop=1&muted=1` : 'about:blank'}
-                allow="autoplay; fullscreen; picture-in-picture"
-                style={{ border: 0 }}
-                title="BORAMEDIA Showreel"
-              />
-            </div>
-            <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 glass px-2.5 py-1 rounded-full text-[11px] font-semibold text-white">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
-              SHOWREEL 2026
-            </div>
-          </div>
+          <VideoWrapper />
         </div>
 
         {/* 데스크톱: 기존 좌우 레이아웃 */}
@@ -115,20 +175,7 @@ export default function Hero({ showreelEmbedUrl, siteConfig }: HeroProps) {
 
           {/* Right: Showreel card (데스크톱만) */}
           <div className="relative hidden lg:block lg:col-span-3">
-            <div className="glass rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
-              <div className="video-wrapper">
-                <iframe
-                  src={showreelEmbedUrl ? `${showreelEmbedUrl}&background=1&autoplay=1&loop=1&muted=1` : 'about:blank'}
-                  allow="autoplay; fullscreen; picture-in-picture"
-                  style={{ border: 0 }}
-                  title="BORAMEDIA Showreel"
-                />
-              </div>
-              <div className="absolute top-4 left-4 inline-flex items-center gap-2 glass px-3 py-1.5 rounded-full text-xs font-semibold text-white">
-                <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-                SHOWREEL 2026
-              </div>
-            </div>
+            <VideoWrapper />
           </div>
         </div>
       </div>

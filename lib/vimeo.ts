@@ -161,10 +161,10 @@ export async function getAllWorks(): Promise<WorkMeta[]> {
   return works;
 }
 
-export async function getShowreel(): Promise<{ vimeoId: string; embedUrl: string } | null> {
+export async function getShowreel(): Promise<{ vimeoId: string; embedUrl: string; thumbnail?: string } | null> {
   const all = await getAllWorks();
   const found = all.find((w) => w.tags.some((t) => t === '메인영상'));
-  return found ? { vimeoId: found.vimeoId, embedUrl: found.vimeoEmbedUrl } : null;
+  return found ? { vimeoId: found.vimeoId, embedUrl: found.vimeoEmbedUrl, thumbnail: found.thumbnail } : null;
 }
 
 export async function getWorkBySlug(slug: string): Promise<WorkMeta | null> {

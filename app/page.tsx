@@ -55,7 +55,7 @@ export default async function HomePage() {
   return (
     <>
       <HomeSchema worksCount={works.length} />
-      <Hero showreelEmbedUrl={showreel?.embedUrl} recentClients={recentClients} siteConfig={siteConfig} />
+      <Hero showreelEmbedUrl={showreel?.embedUrl} showreelThumbnail={showreel?.thumbnail} recentClients={recentClients} siteConfig={siteConfig} />
       <WorksGrid works={featuredWorks} customCategoryLabels={customCategoryLabels} />
       <Stats />
       <Services />
