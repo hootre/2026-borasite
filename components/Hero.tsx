@@ -15,7 +15,8 @@ interface HeroProps {
 export default function Hero({ showreelEmbedUrl, showreelThumbnail, siteConfig }: HeroProps) {
   const cfg = siteConfig ?? DEFAULT_CONFIG;
   const textRef = useRef<HTMLDivElement>(null);
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     const el = textRef.current;
@@ -23,21 +24,53 @@ export default function Hero({ showreelEmbedUrl, showreelThumbnail, siteConfig }
     setTimeout(() => el.classList.add("visible"), 100);
   }, []);
 
-  // 썸네일 fallback: Vimeo CDN 또는 그라디언트 플레이스홀더
-  const posterUrl = showreelThumbnail || null;
+  // Vimeo postMessage로 실제 재생 시작 감지
+  useEffect(() => {
+    if (!showreelEmbedUrl) return;
 
-  const VideoWrapper = ({ className }: { className?: string }) => (
-    <div className={`glass rounded-2xl overflow-hidden border border-white/5 shadow-2xl ${className ?? ''}`}>
+    let fallbackTimer: ReturnType<typeof setTimeout>;
+
+    const handleMessage = (e: MessageEvent) => {
+      if (!e.origin.includes('vimeo.com')) return;
+      try {
+        const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+        // ready 또는 play 이벤트 수신 시 오버레이 제거
+        if (data?.event === 'ready' || data?.event === 'play' || data?.event === 'playProgress') {
+          setVideoReady(true);
+          clearTimeout(fallbackTimer);
+        }
+      } catch {
+        // parse 실패 무시
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    // Vimeo postMessage가 안 오는 경우 대비 fallback (4초)
+    fallbackTimer = setTimeout(() => setVideoReady(true), 4000);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      clearTimeout(fallbackTimer);
+    };
+  }, [showreelEmbedUrl]);
+
+  const VideoWrapper = ({ mobile }: { mobile?: boolean }) => (
+    <div className={`relative glass rounded-2xl overflow-hidden border border-white/5 shadow-2xl ${mobile ? '' : ''}`}>
       <div className="video-wrapper relative">
-        {/* 로딩 오버레이 - 영상 로드 전까지 표시 */}
+        {/* 로딩 오버레이 */}
         <div
-          className="absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-700"
-          style={{ opacity: videoLoaded ? 0 : 1, pointerEvents: videoLoaded ? 'none' : 'auto' }}
+          className="absolute inset-0 z-10 flex items-center justify-center"
+          style={{
+            opacity: videoReady ? 0 : 1,
+            pointerEvents: videoReady ? 'none' : 'auto',
+            transition: 'opacity 0.8s ease',
+          }}
         >
           {/* 썸네일 배경 */}
-          {posterUrl ? (
+          {showreelThumbnail ? (
             <Image
-              src={posterUrl}
+              src={showreelThumbnail}
               alt="Showreel thumbnail"
               fill
               className="object-cover"
@@ -49,39 +82,40 @@ export default function Hero({ showreelEmbedUrl, showreelThumbnail, siteConfig }
               style={{ background: 'linear-gradient(135deg, #1A1A2E 0%, #2D2B55 50%, #1A1A2E 100%)' }}
             />
           )}
-          {/* 어두운 오버레이 */}
-          <div className="absolute inset-0 bg-black/40" />
-          {/* 스피너 + 텍스트 */}
+          {/* 반투명 어두운 오버레이 */}
+          <div className="absolute inset-0 bg-black/50" />
+          {/* 스피너 */}
           <div className="relative z-10 flex flex-col items-center gap-3">
             <div className="relative w-14 h-14">
-              {/* 바깥 원 */}
               <svg className="absolute inset-0 animate-spin" viewBox="0 0 56 56" fill="none">
-                <circle cx="28" cy="28" r="24" stroke="rgba(123,94,167,0.25)" strokeWidth="3" />
-                <path
-                  d="M28 4 A24 24 0 0 1 52 28"
-                  stroke="#9B72CF"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
+                <circle cx="28" cy="28" r="24" stroke="rgba(123,94,167,0.3)" strokeWidth="3" />
+                <path d="M28 4 A24 24 0 0 1 52 28" stroke="#9B72CF" strokeWidth="3" strokeLinecap="round" />
               </svg>
-              {/* 재생 아이콘 */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </div>
             </div>
-            <span className="text-white/60 text-xs tracking-widest uppercase">Loading Showreel</span>
+            <span className="text-white/60 text-[11px] tracking-widest uppercase font-medium">
+              Loading Showreel
+            </span>
           </div>
         </div>
 
-        {/* 실제 Vimeo iframe */}
+        {/* Vimeo iframe */}
         <iframe
-          src={showreelEmbedUrl ? `${showreelEmbedUrl}&background=1&autoplay=1&loop=1&muted=1` : 'about:blank'}
+          ref={iframeRef}
+          src={showreelEmbedUrl
+            ? `${showreelEmbedUrl}&background=1&autoplay=1&loop=1&muted=1`
+            : 'about:blank'}
           allow="autoplay; fullscreen; picture-in-picture"
-          style={{ border: 0, opacity: videoLoaded ? 1 : 0, transition: 'opacity 0.7s ease' }}
+          style={{
+            border: 0,
+            opacity: videoReady ? 1 : 0,
+            transition: 'opacity 0.8s ease',
+          }}
           title="BORAMEDIA Showreel"
-          onLoad={() => setVideoLoaded(true)}
         />
       </div>
 
@@ -108,19 +142,17 @@ export default function Hero({ showreelEmbedUrl, showreelThumbnail, siteConfig }
       {/* Glowing orb */}
       <div
         className="absolute top-1/4 right-1/4 w-[600px] h-[600px] rounded-full opacity-10 blur-[120px] pointer-events-none"
-        style={{
-          background: "radial-gradient(circle, #7B5EA7 0%, transparent 70%)",
-        }}
+        style={{ background: "radial-gradient(circle, #7B5EA7 0%, transparent 70%)" }}
       />
 
       <div className="relative z-10 max-w-7xl mx-auto w-full px-6 pt-24 pb-24">
 
-        {/* 모바일: showreel 상단 배치 */}
-        <div className="block lg:hidden mb-6 relative">
-          <VideoWrapper />
+        {/* 모바일: showreel 상단 */}
+        <div className="block lg:hidden mb-6">
+          <VideoWrapper mobile />
         </div>
 
-        {/* 데스크톱: 기존 좌우 레이아웃 */}
+        {/* 데스크톱: 좌우 레이아웃 */}
         <div className="grid lg:grid-cols-5 gap-12 items-center">
           {/* Left: Text */}
           <div ref={textRef} className="reveal lg:col-span-2 text-center lg:text-left">
@@ -173,7 +205,7 @@ export default function Hero({ showreelEmbedUrl, showreelThumbnail, siteConfig }
             </div>
           </div>
 
-          {/* Right: Showreel card (데스크톱만) */}
+          {/* Right: Showreel (데스크톱) */}
           <div className="relative hidden lg:block lg:col-span-3">
             <VideoWrapper />
           </div>

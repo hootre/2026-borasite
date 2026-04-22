@@ -118,7 +118,7 @@ export default function WorksGrid({ works, customCategoryLabels }: Props) {
       {visible < filtered.length && (
         <div className="flex justify-center mt-12">
           <button
-            onClick={() => setVisible((v) => v + 4)}
+            onClick={() => setVisible((v) => v + (isMobile ? 4 : 8))}
             className="btn-secondary"
           >
             더 보기 ({filtered.length - visible}개 남음)
