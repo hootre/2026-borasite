@@ -56,7 +56,7 @@ export default function Footer() {
               </a>
               <div className="mt-2 flex gap-3">
                 <a
-                  href="https://vimeo.com/boramedia"
+                  href="https://vimeo.com/user215703067"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#888899] hover:text-[#7B5EA7] transition-colors"
