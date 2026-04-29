@@ -38,6 +38,7 @@ export default function Hero({ showreelEmbedUrl, showreelThumbnail, siteConfig }
         if (data?.event === 'ready' || data?.event === 'play' || data?.event === 'playProgress') {
           setVideoReady(true);
           clearTimeout(fallbackTimer);
+          window.dispatchEvent(new CustomEvent('vimeo-ready'));
         }
       } catch {
         // parse 실패 무시
@@ -47,7 +48,10 @@ export default function Hero({ showreelEmbedUrl, showreelThumbnail, siteConfig }
     window.addEventListener('message', handleMessage);
 
     // Vimeo postMessage가 안 오는 경우 대비 fallback (4초)
-    fallbackTimer = setTimeout(() => setVideoReady(true), 4000);
+    fallbackTimer = setTimeout(() => {
+      setVideoReady(true);
+      window.dispatchEvent(new CustomEvent('vimeo-ready'));
+    }, 4000);
 
     return () => {
       window.removeEventListener('message', handleMessage);

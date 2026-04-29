@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getAllWorks } from "@/lib/vimeo";
 import { CATEGORY_LABELS } from "@/lib/types";
+import { getWorkLink } from "@/lib/workLinks";
 import FitTitle from "@/components/FitTitle";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 
@@ -52,6 +53,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function WorkDetailPage({ params }: Props) {
   const { work, related } = await getPageData(params.slug);
   if (!work) notFound();
+
+  const workLink = getWorkLink(work.vimeoId);
 
   // VideoObject JSON-LD
   const videoSchema = {
@@ -192,12 +195,12 @@ export default async function WorkDetailPage({ params }: Props) {
               </div>
             ))}
             <a
-              href={`https://vimeo.com/${work.vimeoId}`}
+              href={workLink.url}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary w-full justify-center text-sm mt-2"
             >
-              Vimeo에서 보기
+              {workLink.text}
               <svg
                 width="14"
                 height="14"

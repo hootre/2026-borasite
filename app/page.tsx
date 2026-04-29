@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Hero from '@/components/Hero';
+import PageLoader from '@/components/PageLoader';
 // KeywordsStrip removed
 import WorksGrid from '@/components/WorksGrid';
 // ClientLogos is now integrated into Stats as background
@@ -54,6 +55,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <PageLoader />
       <HomeSchema worksCount={works.length} />
       <Hero showreelEmbedUrl={showreel?.embedUrl} showreelThumbnail={showreel?.thumbnail} recentClients={recentClients} siteConfig={siteConfig} />
       <WorksGrid works={featuredWorks} customCategoryLabels={customCategoryLabels} />

@@ -9,6 +9,7 @@ import { logoutAction } from './actions';
 import EditModal from './EditModal';
 import UploadSection from './UploadSection';
 import SiteConfigEditor from './SiteConfigEditor';
+import WorkLinksEditor from './WorkLinksEditor';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -18,7 +19,7 @@ interface Stats {
   vimeoConnected: boolean;
 }
 
-type Tab = 'works' | 'upload' | 'homepage' | 'settings';
+type Tab = 'works' | 'upload' | 'homepage' | 'worklinks' | 'settings';
 
 // ─── Category color map ──────────────────────────────────────────────────────
 
@@ -425,10 +426,11 @@ export default function AdminDashboard({
   };
 
   const TABS: { key: Tab; label: string }[] = [
-    { key: 'works',    label: `작품 관리 (${works.length})` },
-    { key: 'upload',   label: '영상 업로드' },
-    { key: 'homepage', label: '홈페이지 수정' },
-    { key: 'settings', label: '설정' },
+    { key: 'works',     label: `작품 관리 (${works.length})` },
+    { key: 'upload',    label: '영상 업로드' },
+    { key: 'homepage',  label: '홈페이지 수정' },
+    { key: 'worklinks', label: '영상 링크' },
+    { key: 'settings',  label: '설정' },
   ];
 
   return (
@@ -592,6 +594,17 @@ export default function AdminDashboard({
                 <p className="text-[#888899] text-sm mt-1">메인 페이지의 타이틀, 통계, 카테고리 이름을 수정합니다.</p>
               </div>
               <SiteConfigEditor />
+            </div>
+          )}
+
+          {/* ── WorkLinks Tab ── */}
+          {tab === 'worklinks' && (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-lg font-bold text-white">영상 링크 관리</h2>
+                <p className="text-[#888899] text-sm mt-1">각 영상 상세 페이지의 버튼 링크와 텍스트를 수정합니다.</p>
+              </div>
+              <WorkLinksEditor works={works} />
             </div>
           )}
 
